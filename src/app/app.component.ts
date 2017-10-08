@@ -46,6 +46,13 @@ dynamicComponent: ComponentRef<AuthFormComponent>;
     this.dynamicComponent.instance.submitted.subscribe((user) => {
       this.loginUser(user);
     });
+
+    // reordering components
+    // 1. lets create another component without overwriting the title property
+    this.entry.createComponent(authFormFactory);
+    // 2. lets move this component in the DOM afterViewInit
+    // using a button
+
   }
 
   loginUser(user: User) {
@@ -56,5 +63,11 @@ dynamicComponent: ComponentRef<AuthFormComponent>;
   destroyComponent() {
     console.log(this.dynamicComponent);
     this.dynamicComponent.destroy();
+  }
+
+  moveComponent() {
+    // second parameter of move method define the index of
+    // the position where the component will show up
+    this.entry.move(this.dynamicComponent.hostView, 1);
   }
 }
