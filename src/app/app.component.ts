@@ -1,4 +1,5 @@
-import { Component } from '@angular/core';
+import { AuthFormComponent } from './auth-form/auth-form.component';
+import { Component, ViewContainerRef, ViewChild, ComponentFactoryResolver, AfterContentInit, ComponentRef } from '@angular/core';
 import { User } from '../app/models/user';
 
 @Component({
@@ -6,18 +7,54 @@ import { User } from '../app/models/user';
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css']
 })
-export class AppComponent {
-  rememberMe = false;
+export class AppComponent implements AfterContentInit {
+dynamicComponent: ComponentRef<AuthFormComponent>;
 
-  rememberUser(remember: boolean) {
-    this.rememberMe = remember;
-  }
+  // using ViewChild we can comunicate directly with
+  // the DOM where is declare the entry variable
+  // so allow us to inject the AuthFormComponent in that place
+  // passing a second argumant as a ViewChild (read property)
+  // this essencially changes what we get back and we want to read
+  // a ViewContainerRef
+  @ViewChild('entry', { read: ViewContainerRef }) entry: ViewContainerRef;
 
-  createUser(user: User) {
-    console.log('Create account', user);
+  // ComponentFactoryResolver allows to create a component factory
+  // base on the dynamic component that we import
+  // and put it in the #entry variable defined as ViewContainerRef
+  constructor(private resolver: ComponentFactoryResolver) {}
+
+  // We use AfterContentInit instead of AfterContentView cause
+  // we want to be the content initialize before the view
+  ngAfterContentInit(): void {
+    // 1. instancate the component (create the factory of our component)
+    // 2. then create the component and injected
+    const authFormFactory = this.resolver.resolveComponentFactory(AuthFormComponent);
+    this.dynamicComponent = this.entry.createComponent(authFormFactory);
+
+    // you can create multiple instances of the same component
+    // const dynamicComponent1 = this.entry.createComponent(authFormFactory);
+    // const dynamicComponent2 = this.entry.createComponent(authFormFactory);
+
+    // IMPORTANT!! Dynamic Components don't apply the decorator @Input, so
+    // how to access the Input Data of Dynamic Components?
+    console.log(this.dynamicComponent.instance);
+    // 1. access the title property and overwrite it
+    this.dynamicComponent.instance.title = 'Create account';
+
+    // how to access the Output Data of Dynamic Components?
+    // 2. access the submitted event emitter
+    this.dynamicComponent.instance.submitted.subscribe((user) => {
+      this.loginUser(user);
+    });
   }
 
   loginUser(user: User) {
-    console.log('Login', user, this.rememberMe);
+    console.log('Login', user);
+  }
+
+  // destroyimg dynamic component
+  destroyComponent() {
+    console.log(this.dynamicComponent);
+    this.dynamicComponent.destroy();
   }
 }

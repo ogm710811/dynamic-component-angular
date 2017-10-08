@@ -6,6 +6,7 @@ import { User } from '../models/user';
   styleUrls: ['./auth-form.component.css']
 })
 export class AuthFormComponent implements OnInit {
+  title = 'Login';
   @Output() submitted: EventEmitter<User> = new EventEmitter<User>();
 
   constructor() { }

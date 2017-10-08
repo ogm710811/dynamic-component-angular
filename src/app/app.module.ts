@@ -18,6 +18,9 @@ import { AuthRememberComponent } from './auth-remember/auth-remember.component';
     CommonModule,
     FormsModule
   ],
+  entryComponents: [
+    AuthFormComponent
+  ],
   providers: [],
   bootstrap: [AppComponent]
 })
